@@ -11,8 +11,8 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, Literal
 
 # Example schemas (replace with your own):
 
@@ -38,8 +38,29 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Photography booking app schemas
+
+ServiceType = Literal[
+    "free style",
+    "pre-wedding shoot",
+    "candid photography",
+    "wedding photography",
+]
+
+class Order(BaseModel):
+    """
+    Orders collection schema
+    Collection name: "order"
+    """
+    name: str = Field(..., min_length=2, description="Client full name")
+    email: EmailStr = Field(..., description="Client email")
+    phone: str = Field(..., min_length=7, max_length=20, description="Contact number")
+    service: ServiceType = Field(..., description="Selected service type")
+    date: str = Field(..., description="Preferred date (YYYY-MM-DD)")
+    message: Optional[str] = Field(None, max_length=1000, description="Additional notes or requirements")
+    status: Literal["new", "review", "confirmed", "completed", "cancelled"] = Field(
+        "new", description="Order status"
+    )
 
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
